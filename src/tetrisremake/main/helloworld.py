@@ -5,3 +5,5 @@ Created on 11/set/2011
 '''
 
 # bla
+
+# modifica per commit di prova da portatile
