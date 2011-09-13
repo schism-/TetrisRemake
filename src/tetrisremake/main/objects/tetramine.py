@@ -12,50 +12,58 @@ class Tetramine(object):
     '''
 
 
-    def __init__(self, scheme, orientation):
+    def __init__(self, scheme, current_orientation, rotations):
         '''
         Constructor
         '''
         self.scheme = scheme
-        self.orientation = orientation
+        self.current_orientation = current_orientation
+        self.rotations = rotations
         self.x = 0
         self.y = 0
+        self.last_stable_render = []
+        self.current_render = []
         
     def  render(self, world):
         
-        pygame.draw.rect(world.screen_surface, (255, 255, 255), (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1], world.mino_width, world.mino_height), 1)
-        
-        
-        #Structure (sign for x, x or y, sign for y, x or y)
-        # 0 = +    1 = -
-        # 0 = x    1 = y
-        
-        rotation_modes = [
-                          [(0, 0, 0, 1), (0, 0, 0, 1)],
-                          [(1, 1, 1, 0), (1, 1, 0, 0)],
-                          [(1, 0, 1, 1), (1, 0, 1, 1)],
-                          [(0, 1, 0, 0), (0, 1, 1, 0)]
-                          ]
-        
-        #rotations = (rotation_modes[0], rotation_modes[1], rotation_modes[2], rotation_modes[3])
-        rotations = (rotation_modes[0], rotation_modes[1], rotation_modes[0], rotation_modes[1])
-        
-        if self.orientation == 0:
-            for (x, y) in self.scheme:
-                self.render_mino(world, rotations[0], (x, y))
+        try:
+            
+            if (world.pos_matrix[self.x][self.y][0] >= 0) and (world.pos_matrix[self.x][self.y][0] < world.x_resolution) and (world.pos_matrix[self.x][self.y][1] >= 0) and (world.pos_matrix[self.x][self.y][1] < world.y_resolution):
+                pygame.draw.rect(world.screen_surface, (255, 255, 255), (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1], world.mino_width, world.mino_height), 1)
                 
-        elif self.orientation == 1:
-            for (x, y) in self.scheme:
-                self.render_mino(world, rotations[1], (x, y))
+                if self.current_orientation == 0:
+                    for (x, y) in self.scheme:
+                        self.render_mino(world, self.rotations[0], (x, y))
+                        
+                elif self.current_orientation == 1:
+                    for (x, y) in self.scheme:
+                        self.render_mino(world, self.rotations[1], (x, y))
+                
+                elif self.current_orientation == 2:
+                    for (x, y) in self.scheme:
+                        self.render_mino(world, self.rotations[2], (x, y))
+                
+                elif self.current_orientation == 3:
+                    for (x, y) in self.scheme:
+                        self.render_mino(world, self.rotations[3], (x, y))
+                
+                self.last_stable_render = self.current_render[:]
+                self.current_render = []
+            else:
+                print "Out of Bounds!!"
+                for mino in self.last_stable_render:
+                    pygame.draw.rect(world.screen_surface, 
+                                     (255, 255, 255), 
+                                     (world.pos_matrix[mino[0][0]][mino[0][1]][0], 
+                                      world.pos_matrix[mino[1][0]][mino[1][1]][1], 
+                                      world.mino_width, 
+                                      world.mino_height), 
+                                     1)
+                self.current_render = []
+        except IndexError:
+            pass
         
-        elif self.orientation == 2:
-            for (x, y) in self.scheme:
-                self.render_mino(world, rotations[2], (x, y))
         
-        elif self.orientation == 3:
-            for (x, y) in self.scheme:
-                self.render_mino(world, rotations[3], (x, y))
-    
     def render_mino(self, world, rotation, pos):
         
         x_rotation = rotation[0]
@@ -107,14 +115,19 @@ class Tetramine(object):
                 y_pos[1] = self.y - pos[0]
             elif y_rotation[3] == 1:
                 y_pos[1] = self.y - pos[1]
-            
-        pygame.draw.rect(world.screen_surface, 
-                                 (255, 255, 255), 
-                                 (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
-                                  world.pos_matrix[y_pos[0]][y_pos[1]][1], 
-                                  world.mino_width, 
-                                  world.mino_height), 
-                                  1)
+        
+        if (world.pos_matrix[x_pos[0]][x_pos[1]][0] >= 0) and (world.pos_matrix[y_pos[0]][y_pos[1]][1] >= 0) and (world.pos_matrix[x_pos[0]][x_pos[1]][0] < world.x_resolution) and (world.pos_matrix[y_pos[0]][y_pos[1]][1] < world.y_resolution): 
+            pygame.draw.rect(world.screen_surface, 
+                             (255, 255, 255), 
+                             (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
+                             world.pos_matrix[y_pos[0]][y_pos[1]][1], 
+                             world.mino_width, 
+                             world.mino_height), 
+                             1)
+            self.current_render.append( (x_pos, y_pos) )
+        else:
+            raise IndexError
+        
     
     def place(self, x, y):
         self.x = x

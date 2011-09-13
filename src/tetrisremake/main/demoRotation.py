@@ -78,7 +78,20 @@ l = [ (0, -1), (0, -2), (1, 0) ]
 s = [ (1, 0), (0, 1), (-1, 1) ]
 z = [ (-1, 0), (0, 1), (1, 1) ]
 
-current_tetra = Tetramine(z, 0)
+
+#Structure (sign for x, x or y, sign for y, x or y)
+# 0 = +    1 = -
+# 0 = x    1 = y
+rotation_modes = [
+                  [(0, 0, 0, 1), (0, 0, 0, 1)],
+                  [(1, 1, 1, 0), (1, 1, 0, 0)],
+                  [(1, 0, 1, 1), (1, 0, 1, 1)],
+                  [(0, 1, 0, 0), (0, 1, 1, 0)]
+                  ]
+
+rotations = (rotation_modes[0], rotation_modes[1], rotation_modes[0], rotation_modes[1])
+
+current_tetra = Tetramine(z, 0, rotations)
 
 current_tetra.place(4,4)
 
@@ -101,9 +114,13 @@ while True:
         pressed_keys = pygame.key.get_pressed()
         
         if pressed_keys[pygame.K_LEFT]:
-            tetris.current_tetra.orientation = (tetris.current_tetra.orientation - 1) % 4
+            tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
         if pressed_keys[pygame.K_RIGHT]:
-            tetris.current_tetra.orientation = (tetris.current_tetra.orientation + 1) % 4
+            tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
+        if pressed_keys[pygame.K_a]:
+            tetris.current_tetra.x -= 1
+        if pressed_keys[pygame.K_d]:
+            tetris.current_tetra.x += 1 
             
         screen.fill((0, 0, 0))  
           
