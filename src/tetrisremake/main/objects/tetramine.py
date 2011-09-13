@@ -28,8 +28,17 @@ class Tetramine(object):
         
         try:
             
-            if (world.pos_matrix[self.x][self.y][0] >= 0) and (world.pos_matrix[self.x][self.y][0] < world.x_resolution) and (world.pos_matrix[self.x][self.y][1] >= 0) and (world.pos_matrix[self.x][self.y][1] < world.y_resolution):
-                pygame.draw.rect(world.screen_surface, (255, 255, 255), (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1], world.mino_width, world.mino_height), 1)
+            if (self.x >= 0) and (self.x < world.x_resolution) and (self.y >= 0) and (self.y < world.y_resolution):
+                
+                pygame.draw.rect(world.screen_surface, 
+                                 (255, 255, 255), 
+                                 (world.pos_matrix[self.x][self.y][0], 
+                                  world.pos_matrix[self.x][self.y][1], 
+                                  world.mino_width, 
+                                  world.mino_height), 
+                                 1)
+                
+                self.current_render.append( ([self.x, self.y], [self.x, self.y]) )
                 
                 if self.current_orientation == 0:
                     for (x, y) in self.scheme:
@@ -49,19 +58,40 @@ class Tetramine(object):
                 
                 self.last_stable_render = self.current_render[:]
                 self.current_render = []
-            else:
-                print "Out of Bounds!!"
-                for mino in self.last_stable_render:
-                    pygame.draw.rect(world.screen_surface, 
-                                     (255, 255, 255), 
-                                     (world.pos_matrix[mino[0][0]][mino[0][1]][0], 
-                                      world.pos_matrix[mino[1][0]][mino[1][1]][1], 
-                                      world.mino_width, 
-                                      world.mino_height), 
-                                     1)
-                self.current_render = []
+                
+            else:           
+                raise IndexError
+            
         except IndexError:
-            pass
+            
+            #===================================================================
+            # if (self.x < 0):
+            #    self.x = 0
+            # if (self.x >= world.x_resolution):
+            #    self.x = world.x_resolution
+            # if (self.y < 0):
+            #    self.y = 0
+            # if (self.y >= world.y_resolution):
+            #    self.y = world.y_resolution
+            #===================================================================
+            
+            self.x = self.last_stable_render[0][0]
+            self.render(world)
+            
+            #===================================================================
+            # print "Out of Bounds!! (%i, %i)" % (self.x, self.y)
+            # print "Center: " + str(self.last_stable_render[0])
+            # for mino in self.last_stable_render:
+            #    pygame.draw.rect(world.screen_surface, 
+            #                     (255, 255, 255), 
+            #                     (world.pos_matrix[mino[0][0]][mino[0][1]][0], 
+            #                      world.pos_matrix[mino[1][0]][mino[1][1]][1], 
+            #                      world.mino_width, 
+            #                      world.mino_height), 
+            #                     1)
+            #===================================================================
+            
+            self.current_render = []
         
         
     def render_mino(self, world, rotation, pos):
@@ -116,7 +146,7 @@ class Tetramine(object):
             elif y_rotation[3] == 1:
                 y_pos[1] = self.y - pos[1]
         
-        if (world.pos_matrix[x_pos[0]][x_pos[1]][0] >= 0) and (world.pos_matrix[y_pos[0]][y_pos[1]][1] >= 0) and (world.pos_matrix[x_pos[0]][x_pos[1]][0] < world.x_resolution) and (world.pos_matrix[y_pos[0]][y_pos[1]][1] < world.y_resolution): 
+        if (x_pos[0] >= 0) and (y_pos[0] >= 0) and (x_pos[1] < world.x_resolution) and (y_pos[1] < world.y_resolution): 
             pygame.draw.rect(world.screen_surface, 
                              (255, 255, 255), 
                              (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
@@ -126,6 +156,7 @@ class Tetramine(object):
                              1)
             self.current_render.append( (x_pos, y_pos) )
         else:
+            print "Mino out of bounds at (%i, %i) (%i, %i)" % (x_pos[0], x_pos[1], y_pos[0], y_pos[1])
             raise IndexError
         
     
