@@ -62,18 +62,24 @@ class Tetramine(object):
         return True
     
     def  render(self, world):
-               
-        pygame.draw.rect(world.screen_surface, 
+        
+        try:    
+            pygame.draw.rect(world.screen_surface, 
                          (255, 0, 0), 
                          (world.pos_matrix[self.x][self.y][0], 
                           world.pos_matrix[self.x][self.y][1], 
                           world.mino_width, 
                           world.mino_height), 
                          1)
-        
+        except IndexError:
+            print "--------------> Error at (%i, %i)" % (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1])
+            
         if self.current_orientation == 0:
             for (x, y) in self.scheme:
-                self.render_mino(world, self.rotations[0], (x, y))
+                try:
+                    self.render_mino(world, self.rotations[0], (x, y))
+                except IndexError:
+                    print "--------------> Error at (%i, %i)" % (x, y)
                 
         elif self.current_orientation == 1:
             for (x, y) in self.scheme:
