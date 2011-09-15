@@ -7,9 +7,10 @@ Created on 11/set/2011
 
 import pygame
 from sys import exit
-from objects import *
+import objects
+from objects import default_tetra
 from tetrisremake.main.objects.tetramine import Tetramine
-
+from random import randint
 
 SCREEN_SIZE = (1000, 1000)
 
@@ -72,26 +73,15 @@ print "----------------------------------------"
 for line in tetris.world_matrix:
     print line
 
-t = [ (1, 0), (-1, 0), (0, -1) ]
-i = [ (0, -1), (0, 1), (0, 2) ]
-l = [ (0, -1), (0, -2), (1, 0) ]
-s = [ (1, 0), (0, 1), (-1, 1) ]
-z = [ (-1, 0), (0, 1), (1, 1) ]
+tetra_list = default_tetra.Classic_Tetra()
 
+#FIX THIS SHITTTTTTT
 
-#Structure (sign for x, x or y, sign for y, x or y)
-# 0 = +    1 = -
-# 0 = x    1 = y
-rotation_modes = [
-                  [(0, 0, 0, 1), (0, 0, 0, 1)],
-                  [(1, 1, 1, 0), (1, 1, 0, 0)],
-                  [(1, 0, 1, 1), (1, 0, 1, 1)],
-                  [(0, 1, 0, 0), (0, 1, 1, 0)]
-                  ]
+x = randint(0,6)
+print "Tetra no " + str(x)
+random_tetra, random_rotations = tetra_list.get_tetra(6)
 
-rotations = (rotation_modes[0], rotation_modes[1], rotation_modes[0], rotation_modes[1])
-
-current_tetra = Tetramine(z, 0, rotations)
+current_tetra = Tetramine(random_tetra, 0, random_rotations)
 
 current_tetra.place(4,4)
 
@@ -110,17 +100,31 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-        
-        pressed_keys = pygame.key.get_pressed()
-        
-        if pressed_keys[pygame.K_LEFT]:
-            tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
-        if pressed_keys[pygame.K_RIGHT]:
-            tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
-        if pressed_keys[pygame.K_a]:
-            tetris.current_tetra.x -= 1
-        if pressed_keys[pygame.K_d]:
-            tetris.current_tetra.x += 1 
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
+                if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
+            elif event.key == pygame.K_RIGHT:
+                tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
+                if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
+            elif event.key == pygame.K_a:
+                tetris.current_tetra.x -= 1
+                if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    tetris.current_tetra.x += 1
+            elif event.key == pygame.K_d:
+                tetris.current_tetra.x += 1 
+                if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    tetris.current_tetra.x -= 1
+            elif event.key == pygame.K_w:
+                tetris.current_tetra.y -= 1
+                if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    tetris.current_tetra.y += 1
+            elif event.key == pygame.K_s:
+                tetris.current_tetra.y += 1 
+                if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    tetris.current_tetra.y -= 1
             
         screen.fill((0, 0, 0))  
           

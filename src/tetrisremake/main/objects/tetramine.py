@@ -21,80 +21,89 @@ class Tetramine(object):
         self.rotations = rotations
         self.x = 0
         self.y = 0
-        self.last_stable_render = []
-        self.current_render = []
+        self.last_stable_center = None
+        self.last_stable_rotation = None
+    
+    
+    def checkBoundaries(self, world):
         
+        if (self.x < 0) or (self.x >= world.x_resolution) or (self.y < 0) or (self.y >= world.y_resolution):
+            print "Center out of bounds @" + str(self.x) + ", " + str(self.y) 
+            return False
+        
+        if self.current_orientation == 0:
+            for (x, y) in self.scheme:
+                x_pos, y_pos = self.calculate_mino_position(self.rotations[0], (x, y))
+                if (x_pos[0] < 0) or (y_pos[1] < 0) or (x_pos[0] >= world.x_resolution) or (y_pos[1] >= world.y_resolution):
+                    print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
+                    return False 
+                
+        elif self.current_orientation == 1:
+            for (x, y) in self.scheme:
+                x_pos, y_pos = self.calculate_mino_position(self.rotations[1], (x, y))
+                if (x_pos[0] < 0) or (y_pos[1] < 0) or (x_pos[0] >= world.x_resolution) or (y_pos[1] >= world.y_resolution):
+                    print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
+                    return False 
+        
+        elif self.current_orientation == 2:
+            for (x, y) in self.scheme:
+                x_pos, y_pos = self.calculate_mino_position(self.rotations[2], (x, y))
+                if (x_pos[0] < 0) or (y_pos[1] < 0) or (x_pos[0] >= world.x_resolution) or (y_pos[1] >= world.y_resolution):
+                    print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
+                    return False 
+        
+        elif self.current_orientation == 3:
+            for (x, y) in self.scheme:
+                x_pos, y_pos = self.calculate_mino_position(self.rotations[3], (x, y))
+                if (x_pos[0] < 0) or (y_pos[1] < 0) or (x_pos[0] >= world.x_resolution) or (y_pos[1] >= world.y_resolution):
+                    print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
+                    return False 
+
+        return True
+    
     def  render(self, world):
+               
+        pygame.draw.rect(world.screen_surface, 
+                         (255, 0, 0), 
+                         (world.pos_matrix[self.x][self.y][0], 
+                          world.pos_matrix[self.x][self.y][1], 
+                          world.mino_width, 
+                          world.mino_height), 
+                         1)
         
-        try:
-            
-            if (self.x >= 0) and (self.x < world.x_resolution) and (self.y >= 0) and (self.y < world.y_resolution):
+        if self.current_orientation == 0:
+            for (x, y) in self.scheme:
+                self.render_mino(world, self.rotations[0], (x, y))
                 
-                pygame.draw.rect(world.screen_surface, 
-                                 (255, 255, 255), 
-                                 (world.pos_matrix[self.x][self.y][0], 
-                                  world.pos_matrix[self.x][self.y][1], 
-                                  world.mino_width, 
-                                  world.mino_height), 
-                                 1)
-                
-                self.current_render.append( ([self.x, self.y], [self.x, self.y]) )
-                
-                if self.current_orientation == 0:
-                    for (x, y) in self.scheme:
-                        self.render_mino(world, self.rotations[0], (x, y))
-                        
-                elif self.current_orientation == 1:
-                    for (x, y) in self.scheme:
-                        self.render_mino(world, self.rotations[1], (x, y))
-                
-                elif self.current_orientation == 2:
-                    for (x, y) in self.scheme:
-                        self.render_mino(world, self.rotations[2], (x, y))
-                
-                elif self.current_orientation == 3:
-                    for (x, y) in self.scheme:
-                        self.render_mino(world, self.rotations[3], (x, y))
-                
-                self.last_stable_render = self.current_render[:]
-                self.current_render = []
-                
-            else:           
-                raise IndexError
-            
-        except IndexError:
-            
-            #===================================================================
-            # if (self.x < 0):
-            #    self.x = 0
-            # if (self.x >= world.x_resolution):
-            #    self.x = world.x_resolution
-            # if (self.y < 0):
-            #    self.y = 0
-            # if (self.y >= world.y_resolution):
-            #    self.y = world.y_resolution
-            #===================================================================
-            
-            self.x = self.last_stable_render[0][0]
-            self.render(world)
-            
-            #===================================================================
-            # print "Out of Bounds!! (%i, %i)" % (self.x, self.y)
-            # print "Center: " + str(self.last_stable_render[0])
-            # for mino in self.last_stable_render:
-            #    pygame.draw.rect(world.screen_surface, 
-            #                     (255, 255, 255), 
-            #                     (world.pos_matrix[mino[0][0]][mino[0][1]][0], 
-            #                      world.pos_matrix[mino[1][0]][mino[1][1]][1], 
-            #                      world.mino_width, 
-            #                      world.mino_height), 
-            #                     1)
-            #===================================================================
-            
-            self.current_render = []
+        elif self.current_orientation == 1:
+            for (x, y) in self.scheme:
+                self.render_mino(world, self.rotations[1], (x, y))
+        
+        elif self.current_orientation == 2:
+            for (x, y) in self.scheme:
+                self.render_mino(world, self.rotations[2], (x, y))
+        
+        elif self.current_orientation == 3:
+            for (x, y) in self.scheme:
+                self.render_mino(world, self.rotations[3], (x, y))
+        
+        self.last_stable_center = [self.x, self.y]
+        self.last_stable_rotation = self.current_orientation
         
         
     def render_mino(self, world, rotation, pos):
+        
+        x_pos, y_pos = self.calculate_mino_position(rotation, pos)
+
+        pygame.draw.rect(world.screen_surface, 
+                         (255, 255, 255), 
+                         (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
+                         world.pos_matrix[y_pos[0]][y_pos[1]][1], 
+                         world.mino_width, 
+                         world.mino_height), 
+                         1)
+        
+    def calculate_mino_position(self, rotation, pos):
         
         x_rotation = rotation[0]
         y_rotation = rotation[1]
@@ -145,20 +154,8 @@ class Tetramine(object):
                 y_pos[1] = self.y - pos[0]
             elif y_rotation[3] == 1:
                 y_pos[1] = self.y - pos[1]
-        
-        if (x_pos[0] >= 0) and (y_pos[0] >= 0) and (x_pos[1] < world.x_resolution) and (y_pos[1] < world.y_resolution): 
-            pygame.draw.rect(world.screen_surface, 
-                             (255, 255, 255), 
-                             (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
-                             world.pos_matrix[y_pos[0]][y_pos[1]][1], 
-                             world.mino_width, 
-                             world.mino_height), 
-                             1)
-            self.current_render.append( (x_pos, y_pos) )
-        else:
-            print "Mino out of bounds at (%i, %i) (%i, %i)" % (x_pos[0], x_pos[1], y_pos[0], y_pos[1])
-            raise IndexError
-        
+    
+        return x_pos, y_pos
     
     def place(self, x, y):
         self.x = x
