@@ -61,6 +61,19 @@ class Tetramine(object):
 
         return True
     
+    def isAtBottom(self, world):
+        
+        for (x, y) in self.scheme:
+            x_pos, y_pos = self.calculate_mino_position(self.rotations[self.current_orientation], (x, y))
+            if (y_pos[1] >= world.y_resolution - 1):
+                print "Mino at bottom @" + str(x_pos) + ", " + str(y_pos)
+                return True
+            elif (world.world_matrix[y_pos[1] + 1][x_pos[0]] == 3):
+                print "Collision @" + str(x_pos) + ", " + str(y_pos)
+                return True
+        
+        return False
+    
     def  render(self, world):
         
         try:    
@@ -100,14 +113,17 @@ class Tetramine(object):
     def render_mino(self, world, rotation, pos):
         
         x_pos, y_pos = self.calculate_mino_position(rotation, pos)
-
-        pygame.draw.rect(world.screen_surface, 
-                         (255, 255, 255), 
-                         (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
-                         world.pos_matrix[y_pos[0]][y_pos[1]][1], 
-                         world.mino_width, 
-                         world.mino_height), 
-                         1)
+        try:
+            pygame.draw.rect(world.screen_surface, 
+                             (255, 255, 255), 
+                             (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
+                             world.pos_matrix[y_pos[0]][y_pos[1]][1], 
+                             world.mino_width, 
+                             world.mino_height), 
+                             1)
+        except IndexError:
+            print "("+ str(x_pos) +")" + " ("+ str(y_pos) +")"
+            raise IndexError
         
     def calculate_mino_position(self, rotation, pos):
         
