@@ -52,6 +52,58 @@ class Classic_Tetra:
         self.rotations.append(z_rotations)
         self.rotations.append(o_rotations)
         
+        t_renders = {
+                     0: [(0, -1), (1, 0), (-1, 0)],
+                     1: [(0, -1), (1, 0), (0, 1)],
+                     2: [(1, 0), (0, 1), (-1, 0)],
+                     3: [(0, -1), (0, 1), (-1, 0)]
+                     }
+        i_renders = {
+                     0: [(0, -1), (0, 1), (0, 2)],
+                     1: [(1, 0), (-1, 0), (-2, 0)],
+                     2: [(0, -1), (0, 1), (0, 2)],
+                     3: [(1, 0), (-1, 0), (-2, 0)]
+                     }
+        l_renders = {
+                     0: [(0, -1), (0, 1), (1, 1)],
+                     1: [(-1, 0), (1, 0), (-1, 1)],
+                     2: [(-1, -1), (0, -1), (0, 1)],
+                     3: [(-1, 0), (1, 0), (1, -1)]
+                     }
+        j_renders = {
+                     0: [(0, -1), (0, 1), (1, -1)],
+                     1: [(-1, 0), (1, 0), (-1, -1)],
+                     2: [(1, -1), (0, -1), (0, 1)],
+                     3: [(-1, 0), (1, 0), (1, 1)]
+                     }
+        s_renders = {
+                     0: [(-1, 0), (0, 1), (1, 1)],
+                     1: [(0, -1), (-1, 0), (-1, 1)],
+                     2: [(-1, 0), (0, 1), (1, 1)],
+                     3: [(0, -1), (-1, 0), (-1, 1)]
+                     }
+        z_renders = {
+                     0: [(1, 0), (0, 1), (-1, 1)],
+                     1: [(0, -1), (1, 0), (1, 1)],
+                     2: [(1, 0), (0, 1), (-1, 1)],
+                     3: [(0, -1), (1, 0), (1, 1)]
+                     }
+        o_renders = {
+                     0: [(1, 0), (0, 1), (1, 1)],
+                     1: [(1, 0), (0, 1), (1, 1)],
+                     2: [(1, 0), (0, 1), (1, 1)],
+                     3: [(1, 0), (0, 1), (1, 1)]
+                     }
+        
+        self.renders = []
+        self.renders.append(t_renders)
+        self.renders.append(i_renders)
+        self.renders.append(l_renders)
+        self.renders.append(j_renders)
+        self.renders.append(s_renders)
+        self.renders.append(z_renders)
+        self.renders.append(o_renders)
+        
     def get_tetra(self, x):
         
-        return self.offsets[x], self.rotations[x]
+        return self.offsets[x], self.rotations[x], self.renders[x]

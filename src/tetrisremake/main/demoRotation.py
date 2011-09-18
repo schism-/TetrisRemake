@@ -36,8 +36,6 @@ class GameWorld(object):
                 
         self.world_matrix = [[0 for i in range(self.x_resolution)] for j in range(self.y_resolution)]
         
-        self.world_matrix[4][7] = 3
-        
         self.pos_matrix = []
         for x in range(self.platform_pos[0], self.platform_width + self.platform_pos[0] , self.mino_width ):
             temp_pos_array = []
@@ -84,6 +82,7 @@ class GameWorld(object):
         for row in range(len(self.pos_matrix[0])):
             temp_end = (self.pos_matrix[-1][row][0] + self.mino_width, self.pos_matrix[-1][row][1])
             pygame.draw.line(self.screen_surface, (62, 62, 62), self.pos_matrix[0][row], temp_end, 2)
+            
         temp_beg = (self.pos_matrix[0][len(self.pos_matrix[0]) - 1][0], 
                     self.pos_matrix[0][len(self.pos_matrix[0]) - 1][1] + self.mino_height)
          
@@ -131,7 +130,7 @@ pygame.time.set_timer(pygame.USEREVENT + 1, 1000)
 x = randint(0,6)
 random_tetra, random_rotations = tetra_list.get_tetra(x)
 current_tetra = Tetramine(random_tetra, 0, random_rotations)
-current_tetra.place(4,4)
+current_tetra.place(5,1)
 tetris.add_tetramino(current_tetra)
 
 while True:
@@ -143,49 +142,64 @@ while True:
             exit()
             
         elif event.type == pygame.USEREVENT + 1:
-            tetris.current_tetra.y += 1 
-            if tetris.current_tetra.checkBoundaries(tetris) == False:
-                tetris.current_tetra.y -= 1
-                
-        elif event.type == pygame.KEYDOWN:
-            print "Coord: (%i, %i)" % (tetris.current_tetra.x, tetris.current_tetra.y)
-            if event.key == pygame.K_LEFT:
-                tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
-                if tetris.current_tetra.checkBoundaries(tetris) == False:
-                    tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
-            elif event.key == pygame.K_RIGHT:
-                tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
-                if tetris.current_tetra.checkBoundaries(tetris) == False:
-                    tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
-            elif event.key == pygame.K_a:
-                tetris.current_tetra.x -= 1
-                if tetris.current_tetra.checkBoundaries(tetris) == False:
-                    tetris.current_tetra.x += 1
-            elif event.key == pygame.K_d:
-                tetris.current_tetra.x += 1 
-                if tetris.current_tetra.checkBoundaries(tetris) == False:
-                    tetris.current_tetra.x -= 1
-            elif event.key == pygame.K_w:
-                tetris.current_tetra.y -= 1
-                if tetris.current_tetra.checkBoundaries(tetris) == False:
-                    tetris.current_tetra.y += 1
-            elif event.key == pygame.K_s:
+            if tetris.current_tetra is not None:
                 tetris.current_tetra.y += 1 
                 if tetris.current_tetra.checkBoundaries(tetris) == False:
                     tetris.current_tetra.y -= 1
-        
-    if (tetris.current_tetra is not None) and (tetris.current_tetra.isAtBottom(tetris) == True):
-        print "Bottom!!!"
-        for (x, y) in tetris.current_tetra.scheme:
-            x_pos, y_pos = tetris.current_tetra.calculate_mino_position(tetris.current_tetra.rotations[tetris.current_tetra.current_orientation], (x, y))
-            tetris.world_matrix[x_pos[1]][x_pos[0]] = 3
-        
-        tetris.current_tetra = None
-    milliseconds_passed = main_clock.tick(60)
-        
+            else:
+                x = randint(0,6)
+                random_tetra, random_rotations = tetra_list.get_tetra(x)
+                current_tetra = Tetramine(random_tetra, 0, random_rotations)
+                current_tetra.place(5,1)
+                tetris.add_tetramino(current_tetra)
+                
+        elif event.type == pygame.KEYDOWN:
+            if tetris.current_tetra is not None:
+                print "Coord: (%i, %i)" % (tetris.current_tetra.x, tetris.current_tetra.y)
+                if event.key == pygame.K_LEFT:
+                    tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
+                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                        tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
+                elif event.key == pygame.K_RIGHT:
+                    tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
+                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                        tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
+                elif event.key == pygame.K_a:
+                    tetris.current_tetra.x -= 1
+                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                        tetris.current_tetra.x += 1
+                elif event.key == pygame.K_d:
+                    tetris.current_tetra.x += 1 
+                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                        tetris.current_tetra.x -= 1
+                elif event.key == pygame.K_w:
+                    tetris.current_tetra.y -= 1
+                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                        tetris.current_tetra.y += 1
+                elif event.key == pygame.K_s:
+                    tetris.current_tetra.y += 1 
+                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                        tetris.current_tetra.y -= 1
+
     screen.fill((0, 0, 0))  
       
     tetris.render()
     
     pygame.display.update()
+        
+    if (tetris.current_tetra is not None) and (tetris.current_tetra.isAtBottom(tetris) == True):
+        print "Bottom!!!"
+        
+        x_pos, y_pos = tetris.current_tetra.calculate_mino_position(tetris.current_tetra.rotations[tetris.current_tetra.current_orientation], (0, 0))
+        tetris.world_matrix[y_pos[1]][x_pos[0]] = 3
+        
+        for (x, y) in tetris.current_tetra.scheme:
+            x_pos, y_pos = tetris.current_tetra.calculate_mino_position(tetris.current_tetra.rotations[tetris.current_tetra.current_orientation], (x, y))
+            print "--------> X: (%i, %i) Y:(%i, %i)" % (x_pos[0],x_pos[1],y_pos[0],y_pos[1] )
+            tetris.world_matrix[y_pos[1]][x_pos[0]] = 3
+        
+        tetris.current_tetra = None
+    milliseconds_passed = main_clock.tick(60)
+        
+
             

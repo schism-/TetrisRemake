@@ -63,6 +63,14 @@ class Tetramine(object):
     
     def isAtBottom(self, world):
         
+        x_pos, y_pos = self.calculate_mino_position(self.rotations[self.current_orientation], (0, 0))
+        if (y_pos[1] >= world.y_resolution - 1):
+            print "Mino at bottom @" + str(x_pos) + ", " + str(y_pos)
+            return True
+        elif (world.world_matrix[y_pos[1] + 1][x_pos[0]] == 3):
+            print "Collision @" + str(x_pos) + ", " + str(y_pos)
+            return True
+        
         for (x, y) in self.scheme:
             x_pos, y_pos = self.calculate_mino_position(self.rotations[self.current_orientation], (x, y))
             if (y_pos[1] >= world.y_resolution - 1):
@@ -114,18 +122,89 @@ class Tetramine(object):
         
         x_pos, y_pos = self.calculate_mino_position(rotation, pos)
         try:
+            #===================================================================
+            # pygame.draw.rect(world.screen_surface, 
+            #                 (255, 255, 255), 
+            #                 (world.pos_matrix[x_pos[0]][x_pos[1]][0],
+            #                  world.pos_matrix[y_pos[0]][y_pos[1]][1], 
+            #                  world.mino_width, 
+            #                  world.mino_height), 
+            #                  1)
+            #===================================================================
+            
             pygame.draw.rect(world.screen_surface, 
                              (255, 255, 255), 
-                             (world.pos_matrix[x_pos[0]][x_pos[1]][0], 
-                             world.pos_matrix[y_pos[0]][y_pos[1]][1], 
-                             world.mino_width, 
-                             world.mino_height), 
-                             1)
+                             (world.pos_matrix[y_pos[1]][x_pos[0]][1],
+                              world.pos_matrix[y_pos[1]][x_pos[0]][0], 
+                              world.mino_width, 
+                              world.mino_height), 
+                              1)
         except IndexError:
             print "("+ str(x_pos) +")" + " ("+ str(y_pos) +")"
             raise IndexError
         
+        
+    #===========================================================================
+    # def calculate_mino_position(self, rotation, pos):
+    #    
+    #    x_rotation = rotation[0]
+    #    y_rotation = rotation[1]
+    #    
+    #    x_pos = [0, 0]
+    #    y_pos = [0, 0]
+    #    
+    #    if x_rotation[0] == 0:
+    #        if x_rotation[1] == 0:
+    #            x_pos[0] = self.x + pos[0]
+    #        elif x_rotation[1] == 1:
+    #            x_pos[0] = self.x + pos[1]
+    #    elif x_rotation[0] == 1:
+    #        if x_rotation[1] == 0:
+    #            x_pos[0] = self.x - pos[0]
+    #        elif x_rotation[1] == 1:
+    #            x_pos[0] = self.x - pos[1]
+    #          
+    #    if x_rotation[2] == 0:
+    #        if x_rotation[3] == 0:
+    #            x_pos[1] = self.y + pos[0]
+    #        elif x_rotation[3] == 1:
+    #            x_pos[1] = self.y + pos[1]
+    #    elif x_rotation[2] == 1:
+    #        if x_rotation[3] == 0:
+    #            x_pos[1] = self.y - pos[0]
+    #        elif x_rotation[3] == 1:
+    #            x_pos[1] = self.y - pos[1]
+    #    
+    #    if y_rotation[0] == 0:
+    #        if y_rotation[1] == 0:
+    #            y_pos[0] = self.x + pos[0]
+    #        elif y_rotation[1] == 1:
+    #            y_pos[0] = self.x + pos[1]
+    #    elif y_rotation[0] == 1:
+    #        if y_rotation[1] == 0:
+    #            y_pos[0] = self.x - pos[0]
+    #        elif y_rotation[1] == 1:
+    #            y_pos[0] = self.x - pos[1]
+    #          
+    #    if y_rotation[2] == 0:
+    #        if y_rotation[3] == 0:
+    #            y_pos[1] = self.y + pos[0]
+    #        elif y_rotation[3] == 1:
+    #            y_pos[1] = self.y + pos[1]
+    #    elif y_rotation[2] == 1:
+    #        if y_rotation[3] == 0:
+    #            y_pos[1] = self.y - pos[0]
+    #        elif y_rotation[3] == 1:
+    #            y_pos[1] = self.y - pos[1]
+    # 
+    #    return x_pos, y_pos
+    #===========================================================================
+    
     def calculate_mino_position(self, rotation, pos):
+        
+        #Structure (sign for x, x or y, sign for y, x or y)
+        # 0 = +    1 = -
+        # 0 = x    1 = y
         
         x_rotation = rotation[0]
         y_rotation = rotation[1]
@@ -154,28 +233,6 @@ class Tetramine(object):
                 x_pos[1] = self.y - pos[0]
             elif x_rotation[3] == 1:
                 x_pos[1] = self.y - pos[1]
-        
-        if y_rotation[0] == 0:
-            if y_rotation[1] == 0:
-                y_pos[0] = self.x + pos[0]
-            elif y_rotation[1] == 1:
-                y_pos[0] = self.x + pos[1]
-        elif y_rotation[0] == 1:
-            if y_rotation[1] == 0:
-                y_pos[0] = self.x - pos[0]
-            elif y_rotation[1] == 1:
-                y_pos[0] = self.x - pos[1]
-              
-        if y_rotation[2] == 0:
-            if y_rotation[3] == 0:
-                y_pos[1] = self.y + pos[0]
-            elif y_rotation[3] == 1:
-                y_pos[1] = self.y + pos[1]
-        elif y_rotation[2] == 1:
-            if y_rotation[3] == 0:
-                y_pos[1] = self.y - pos[0]
-            elif y_rotation[3] == 1:
-                y_pos[1] = self.y - pos[1]
     
         return x_pos, y_pos
     
