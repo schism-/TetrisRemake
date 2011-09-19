@@ -34,7 +34,7 @@ class GameWorld(object):
         self.mino_width = int(self.platform_width / x_resolution)
         self.mino_height = int(self.platform_height / y_resolution)
                 
-        self.world_matrix = [[0 for i in range(self.x_resolution)] for j in range(self.y_resolution)]
+        self.world_matrix = [[0 for i in range(self.y_resolution)] for j in range(self.x_resolution)]
         
         self.pos_matrix = []
         for x in range(self.platform_pos[0], self.platform_width + self.platform_pos[0] , self.mino_width ):
@@ -42,6 +42,9 @@ class GameWorld(object):
             for y in range(self.platform_pos[1], self.platform_height + self.platform_pos[1], self.mino_height ):
                 temp_pos_array.append((x, y))
             self.pos_matrix.append(temp_pos_array)
+            
+        print "World Matrix: " + str(len(self.world_matrix)) + " x " + str(len(self.world_matrix[0]))
+        print "Pos Matrix: " + str(len(self.pos_matrix)) + " x " + str(len(self.pos_matrix[0]))
         
     def calculate_platform(self):
         #min_dimension = self.screen_size[0] if (self.screen_size[0] < self.screen_size[1]) else self.screen_size[1]
@@ -93,9 +96,9 @@ class GameWorld(object):
     
     def render_non_moving_blocks(self):
         
-        for y in range(len(self.world_matrix)):
-            for x in range(len(self.world_matrix[y])):
-                if self.world_matrix[y][x] == 3:
+        for x in range(len(self.world_matrix)):
+            for y in range(len(self.world_matrix[x])):
+                if self.world_matrix[x][y] == 3:
                     pygame.draw.rect(self.screen_surface, 
                          (0, 255, 127), 
                          (self.pos_matrix[x][y][0], 
@@ -128,8 +131,8 @@ pygame.time.set_timer(pygame.USEREVENT + 1, 1000)
 
 #Choose a random tetra
 x = randint(0,6)
-random_tetra, random_rotations = tetra_list.get_tetra(x)
-current_tetra = Tetramine(random_tetra, 0, random_rotations)
+random_tetra, random_rotations, random_renders = tetra_list.get_tetra(x)
+current_tetra = Tetramine(random_tetra, 0, random_rotations, random_renders)
 current_tetra.place(5,1)
 tetris.add_tetramino(current_tetra)
 
@@ -148,8 +151,8 @@ while True:
                     tetris.current_tetra.y -= 1
             else:
                 x = randint(0,6)
-                random_tetra, random_rotations = tetra_list.get_tetra(x)
-                current_tetra = Tetramine(random_tetra, 0, random_rotations)
+                random_tetra, random_rotations, random_renders = tetra_list.get_tetra(x)
+                current_tetra = Tetramine(random_tetra, 0, random_rotations, random_renders)
                 current_tetra.place(5,1)
                 tetris.add_tetramino(current_tetra)
                 
@@ -190,13 +193,13 @@ while True:
     if (tetris.current_tetra is not None) and (tetris.current_tetra.isAtBottom(tetris) == True):
         print "Bottom!!!"
         
-        x_pos, y_pos = tetris.current_tetra.calculate_mino_position(tetris.current_tetra.rotations[tetris.current_tetra.current_orientation], (0, 0))
-        tetris.world_matrix[y_pos[1]][x_pos[0]] = 3
+        x_pos, y_pos = tetris.current_tetra.calculate_mino_position((0, 0))
+        tetris.world_matrix[x_pos][y_pos] = 3
         
-        for (x, y) in tetris.current_tetra.scheme:
-            x_pos, y_pos = tetris.current_tetra.calculate_mino_position(tetris.current_tetra.rotations[tetris.current_tetra.current_orientation], (x, y))
-            print "--------> X: (%i, %i) Y:(%i, %i)" % (x_pos[0],x_pos[1],y_pos[0],y_pos[1] )
-            tetris.world_matrix[y_pos[1]][x_pos[0]] = 3
+        for (x, y) in tetris.current_tetra.renders[tetris.current_tetra.current_orientation]:
+            x_pos, y_pos = tetris.current_tetra.calculate_mino_position((x, y))
+            print "--------> (%i, %i) " % (x_pos,y_pos)
+            tetris.world_matrix[x_pos][y_pos] = 3
         
         tetris.current_tetra = None
     milliseconds_passed = main_clock.tick(60)
