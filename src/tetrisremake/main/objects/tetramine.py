@@ -31,10 +31,8 @@ class Tetramine(object):
         if (self.x < 0) or\
             (self.x >= world.x_resolution) or\
             (self.y < 0) or\
-            (self.y >= world.y_resolution) or\
-            (world.world_matrix[self.x + 1][self.y] == 3) or\
-            (world.world_matrix[self.x - 1][self.y] == 3):
-            print "Center out of bounds @" + str(self.x) + ", " + str(self.y) 
+            (self.y >= world.y_resolution):
+            #print "Center out of bounds @" + str(self.x) + ", " + str(self.y) 
             return False
         
         for mino_offset in self.renders[self.current_orientation]:
@@ -42,13 +40,23 @@ class Tetramine(object):
             if (x_pos < 0) or\
                 (y_pos < 0) or\
                 (x_pos >= world.x_resolution) or\
-                (y_pos >= world.y_resolution) or\
-                (world.world_matrix[x_pos + 1][y_pos] == 3) or\
-                (world.world_matrix[x_pos - 1][y_pos] == 3):
-                    print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
+                (y_pos >= world.y_resolution):
+                    #print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
                     return False 
+
+        return True
+    
+    def checkCollisions(self, world):
         
+        if  world.world_matrix[self.x][self.y] == 3:
+            #print "Center out of bounds @" + str(self.x) + ", " + str(self.y) 
+            return False
         
+        for mino_offset in self.renders[self.current_orientation]:
+            x_pos, y_pos = self.calculate_mino_position(mino_offset)
+            if world.world_matrix[x_pos][y_pos] == 3:
+                    #print "Mino out of bounds @" + str(x_pos) + ", " + str(y_pos)
+                    return False 
 
         return True
     
@@ -57,19 +65,19 @@ class Tetramine(object):
         x_pos, y_pos = self.calculate_mino_position((0, 0))
         
         if (y_pos >= world.y_resolution - 1):
-            print "Mino at bottom @" + str(x_pos) + ", " + str(y_pos)
+            #print "Mino at bottom @" + str(x_pos) + ", " + str(y_pos)
             return True
         elif (world.world_matrix[x_pos][y_pos + 1] == 3):
-            print "Collision @" + str(x_pos) + ", " + str(y_pos)
+            #print "Collision @" + str(x_pos) + ", " + str(y_pos)
             return True
         
         for mino_offset in self.renders[self.current_orientation]:
             x_pos, y_pos = self.calculate_mino_position(mino_offset)
             if (y_pos >= world.y_resolution - 1):
-                print "Mino at bottom @" + str(x_pos) + ", " + str(y_pos)
+                #print "Mino at bottom @" + str(x_pos) + ", " + str(y_pos)
                 return True
             elif (world.world_matrix[x_pos][y_pos + 1] == 3):
-                print "Collision @" + str(x_pos) + ", " + str(y_pos)
+                #print "Collision @" + str(x_pos) + ", " + str(y_pos)
                 return True
         
         return False

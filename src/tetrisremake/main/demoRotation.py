@@ -127,7 +127,11 @@ tetra_list = default_tetra.Classic_Tetra()
 main_clock = pygame.time.Clock()
 
 #Set timer for tetra's drop 
-pygame.time.set_timer(pygame.USEREVENT + 1, 1000)
+pygame.time.set_timer(pygame.USEREVENT + 1, 700)
+
+#Set timer for tetra's transition to non-moving blocks
+transitionTimer = False
+pygame.time.set_timer(pygame.USEREVENT + 2, 0)
 
 #Choose a random tetra
 x = randint(0,6)
@@ -138,6 +142,19 @@ tetris.add_tetramino(current_tetra)
 
 while True:
     
+    screen.fill((0, 0, 0))  
+      
+    tetris.render()
+    
+    pygame.display.update()
+
+    if (tetris.current_tetra == None):
+        x = randint(0,6)
+        random_tetra, random_rotations, random_renders = tetra_list.get_tetra(x)
+        current_tetra = Tetramine(random_tetra, 0, random_rotations, random_renders)
+        current_tetra.place(5,1)
+        tetris.add_tetramino(current_tetra)
+    
     for event in pygame.event.get():
         
         if event.type == pygame.QUIT:
@@ -145,63 +162,63 @@ while True:
             exit()
             
         elif event.type == pygame.USEREVENT + 1:
-            if tetris.current_tetra is not None:
+            if (tetris.current_tetra is not None) and (transitionTimer is not True):
                 tetris.current_tetra.y += 1 
                 if tetris.current_tetra.checkBoundaries(tetris) == False:
                     tetris.current_tetra.y -= 1
-            else:
-                x = randint(0,6)
-                random_tetra, random_rotations, random_renders = tetra_list.get_tetra(x)
-                current_tetra = Tetramine(random_tetra, 0, random_rotations, random_renders)
-                current_tetra.place(5,1)
-                tetris.add_tetramino(current_tetra)
+                
+        elif event.type == pygame.USEREVENT + 2:
+            print "Transition."
+            x_pos, y_pos = tetris.current_tetra.calculate_mino_position((0, 0))
+            tetris.world_matrix[x_pos][y_pos] = 3
+         
+            for (x, y) in tetris.current_tetra.renders[tetris.current_tetra.current_orientation]:
+                x_pos, y_pos = tetris.current_tetra.calculate_mino_position((x, y))
+                tetris.world_matrix[x_pos][y_pos] = 3
+                
+            tetris.current_tetra = None
+            transitionTimer = False
+            pygame.time.set_timer(pygame.USEREVENT + 2, 0)
+            
                 
         elif event.type == pygame.KEYDOWN:
             if tetris.current_tetra is not None:
-                print "Coord: (%i, %i)" % (tetris.current_tetra.x, tetris.current_tetra.y)
                 if event.key == pygame.K_LEFT:
                     tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
-                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    if tetris.current_tetra.checkBoundaries(tetris) == False or\
+                        tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
                 elif event.key == pygame.K_RIGHT:
                     tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
-                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    if tetris.current_tetra.checkBoundaries(tetris) == False or\
+                        tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
                 elif event.key == pygame.K_a:
                     tetris.current_tetra.x -= 1
-                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    if tetris.current_tetra.checkBoundaries(tetris) == False or\
+                        tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.x += 1
                 elif event.key == pygame.K_d:
                     tetris.current_tetra.x += 1 
-                    if tetris.current_tetra.checkBoundaries(tetris) == False:
+                    if tetris.current_tetra.checkBoundaries(tetris) == False or\
+                        tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.x -= 1
                 elif event.key == pygame.K_w:
                     tetris.current_tetra.y -= 1
                     if tetris.current_tetra.checkBoundaries(tetris) == False:
                         tetris.current_tetra.y += 1
-                elif event.key == pygame.K_s:
+                elif event.key == pygame.K_s and (transitionTimer is not True):
                     tetris.current_tetra.y += 1 
                     if tetris.current_tetra.checkBoundaries(tetris) == False:
                         tetris.current_tetra.y -= 1
 
-    screen.fill((0, 0, 0))  
-      
-    tetris.render()
-    
-    pygame.display.update()
-        
     if (tetris.current_tetra is not None) and (tetris.current_tetra.isAtBottom(tetris) == True):
         print "Bottom!!!"
         
-        x_pos, y_pos = tetris.current_tetra.calculate_mino_position((0, 0))
-        tetris.world_matrix[x_pos][y_pos] = 3
+        if transitionTimer is not True:            
+            pygame.time.set_timer(pygame.USEREVENT + 2, 700)
+            transitionTimer = True
         
-        for (x, y) in tetris.current_tetra.renders[tetris.current_tetra.current_orientation]:
-            x_pos, y_pos = tetris.current_tetra.calculate_mino_position((x, y))
-            print "--------> (%i, %i) " % (x_pos,y_pos)
-            tetris.world_matrix[x_pos][y_pos] = 3
-        
-        tetris.current_tetra = None
     milliseconds_passed = main_clock.tick(60)
         
 
