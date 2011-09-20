@@ -169,16 +169,21 @@ while True:
                 
         elif event.type == pygame.USEREVENT + 2:
             print "Transition."
-            x_pos, y_pos = tetris.current_tetra.calculate_mino_position((0, 0))
-            tetris.world_matrix[x_pos][y_pos] = 3
-         
-            for (x, y) in tetris.current_tetra.renders[tetris.current_tetra.current_orientation]:
-                x_pos, y_pos = tetris.current_tetra.calculate_mino_position((x, y))
+            if tetris.current_tetra.isAtBottom(tetris) == True:
+                x_pos, y_pos = tetris.current_tetra.calculate_mino_position((0, 0))
                 tetris.world_matrix[x_pos][y_pos] = 3
-                
-            tetris.current_tetra = None
-            transitionTimer = False
-            pygame.time.set_timer(pygame.USEREVENT + 2, 0)
+             
+                for (x, y) in tetris.current_tetra.renders[tetris.current_tetra.current_orientation]:
+                    x_pos, y_pos = tetris.current_tetra.calculate_mino_position((x, y))
+                    tetris.world_matrix[x_pos][y_pos] = 3
+                    
+                tetris.current_tetra = None
+                transitionTimer = False
+                pygame.time.set_timer(pygame.USEREVENT + 2, 0)
+            else:
+                print "Derp."
+                transitionTimer = False
+                pygame.time.set_timer(pygame.USEREVENT + 2, 0)
             
                 
         elif event.type == pygame.KEYDOWN:
@@ -188,29 +193,40 @@ while True:
                     if tetris.current_tetra.checkBoundaries(tetris) == False or\
                         tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
+                
                 elif event.key == pygame.K_RIGHT:
                     tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation + 1) % 4
                     if tetris.current_tetra.checkBoundaries(tetris) == False or\
                         tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.current_orientation = (tetris.current_tetra.current_orientation - 1) % 4
+                
                 elif event.key == pygame.K_a:
                     tetris.current_tetra.x -= 1
                     if tetris.current_tetra.checkBoundaries(tetris) == False or\
                         tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.x += 1
+
                 elif event.key == pygame.K_d:
                     tetris.current_tetra.x += 1 
                     if tetris.current_tetra.checkBoundaries(tetris) == False or\
                         tetris.current_tetra.checkCollisions(tetris) == False:
                         tetris.current_tetra.x -= 1
+
                 elif event.key == pygame.K_w:
                     tetris.current_tetra.y -= 1
                     if tetris.current_tetra.checkBoundaries(tetris) == False:
                         tetris.current_tetra.y += 1
+                    else:
+                        transitionTimer = False
+                        pygame.time.set_timer(pygame.USEREVENT + 2, 0)
+                        
                 elif event.key == pygame.K_s and (transitionTimer is not True):
                     tetris.current_tetra.y += 1 
                     if tetris.current_tetra.checkBoundaries(tetris) == False:
                         tetris.current_tetra.y -= 1
+                    else:
+                        transitionTimer = False
+                        pygame.time.set_timer(pygame.USEREVENT + 2, 0)
 
     if (tetris.current_tetra is not None) and (tetris.current_tetra.isAtBottom(tetris) == True):
         print "Bottom!!!"
