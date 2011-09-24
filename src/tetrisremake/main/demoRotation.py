@@ -72,6 +72,20 @@ class GameWorld(object):
         #TODO: Render current tetramino
         if self.current_tetra is not None:
             self.current_tetra.render(self)
+            
+        #Check completed lines
+        if (len(self.checkLines()) > 0):
+            #print "Completed lines: " + str(tetris.checkLines())
+            for line in self.checkLines():
+                #print "Rendering line " + str(line)
+                for x in range(len(self.pos_matrix)):
+                    temp_end = ( self.pos_matrix[x][line][0] + self.mino_width, self.pos_matrix[x][line][1] + self.mino_height)
+                    pygame.draw.line( tetris.screen_surface,
+                                      (156,127,32),
+                                      self.pos_matrix[x][line],
+                                      temp_end,
+                                      2
+                                     )
     
     def render_grid(self):
         for col in self.pos_matrix:
@@ -106,7 +120,20 @@ class GameWorld(object):
                           self.mino_width, 
                           self.mino_height), 
                          1)
-                    
+    
+    def checkLines(self):
+        lines = []
+        
+        for line in range(len(self.world_matrix[0])):
+            blocks = 0
+            for x in range(len(self.world_matrix)):
+                if self.world_matrix[x][line] == 3:
+                    blocks += 1
+            if blocks == len(self.world_matrix):
+                lines.append(line)
+        
+        return lines
+    
 #===============================================================================
 # 
 #    0 = empty block
@@ -127,7 +154,7 @@ tetra_list = default_tetra.Classic_Tetra()
 main_clock = pygame.time.Clock()
 
 #Set timer for tetra's drop 
-pygame.time.set_timer(pygame.USEREVENT + 1, 700)
+pygame.time.set_timer(pygame.USEREVENT + 1, 600)
 
 #Set timer for tetra's transition to non-moving blocks
 transitionTimer = False
@@ -232,9 +259,10 @@ while True:
         print "Bottom!!!"
         
         if transitionTimer is not True:            
-            pygame.time.set_timer(pygame.USEREVENT + 2, 700)
+            pygame.time.set_timer(pygame.USEREVENT + 2, 500)
             transitionTimer = True
-        
+    
+    
     milliseconds_passed = main_clock.tick(60)
         
 
