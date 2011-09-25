@@ -72,20 +72,6 @@ class GameWorld(object):
         #TODO: Render current tetramino
         if self.current_tetra is not None:
             self.current_tetra.render(self)
-            
-        #Check completed lines
-        if (len(self.checkLines()) > 0):
-            #print "Completed lines: " + str(tetris.checkLines())
-            for line in self.checkLines():
-                #print "Rendering line " + str(line)
-                for x in range(len(self.pos_matrix)):
-                    temp_end = ( self.pos_matrix[x][line][0] + self.mino_width, self.pos_matrix[x][line][1] + self.mino_height)
-                    pygame.draw.line( tetris.screen_surface,
-                                      (156,127,32),
-                                      self.pos_matrix[x][line],
-                                      temp_end,
-                                      2
-                                     )
     
     def render_grid(self):
         for col in self.pos_matrix:
@@ -134,6 +120,23 @@ class GameWorld(object):
         
         return lines
     
+    def removeLines(self):
+        if (len(self.checkLines()) > 0):
+            for line in self.checkLines():
+                print "Removing line no" + str(line)
+                self.removeSingleLine(line)
+                
+    def removeSingleLine(self, lineNo):
+        for line in range(lineNo, 1, -1 ):
+            zeros = 0
+            for x in range( len(self.world_matrix) ):
+                self.world_matrix[x][line] = self.world_matrix[x][line - 1]
+                if self.world_matrix[x][line - 1] == 0:
+                    zeros += 1
+            if zeros == len(self.world_matrix[0]):
+                break
+                  
+    
 #===============================================================================
 # 
 #    0 = empty block
@@ -170,6 +173,8 @@ tetris.add_tetramino(current_tetra)
 while True:
     
     screen.fill((0, 0, 0))  
+      
+    tetris.removeLines()
       
     tetris.render()
     
