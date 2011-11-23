@@ -82,11 +82,11 @@ class Tetramine(object):
         
         return False
         
-    def  render(self, world):
+    def  render(self, world, center_color = (255, 0, 0), mino_color = (255, 255, 255)):
         
         try:    
             pygame.draw.rect(world.screen_surface, 
-                         (255, 0, 0), 
+                         center_color, 
                          (world.pos_matrix[self.x][self.y][0], 
                           world.pos_matrix[self.x][self.y][1], 
                           world.mino_width, 
@@ -96,15 +96,15 @@ class Tetramine(object):
             print "--------------> Error at (%i, %i)" % (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1])
             
         for mino_offset in self.renders[self.current_orientation]:
-            self.render_mino(world, mino_offset)
+            self.render_mino(world, mino_offset, mino_color)
        
         
-    def render_mino(self, world, mino_offset):
+    def render_mino(self, world, mino_offset, color):
         
         x_pos, y_pos = self.calculate_mino_position(mino_offset)
         try:
             pygame.draw.rect(world.screen_surface, 
-                             (255, 255, 255), 
+                             color, 
                              (world.pos_matrix[x_pos][y_pos][0],
                               world.pos_matrix[x_pos][y_pos][1], 
                               world.mino_width, 

@@ -46,6 +46,12 @@ class GameWorld(object):
         print "World Matrix: " + str(len(self.world_matrix)) + " x " + str(len(self.world_matrix[0]))
         print "Pos Matrix: " + str(len(self.pos_matrix)) + " x " + str(len(self.pos_matrix[0]))
         
+        self.default_font = pygame.font.SysFont("arial", 18) 
+        
+        self.points = 0
+        
+        self.game_over = False
+        
     def calculate_platform(self):
         #min_dimension = self.screen_size[0] if (self.screen_size[0] < self.screen_size[1]) else self.screen_size[1]
         
@@ -67,11 +73,15 @@ class GameWorld(object):
         
         #TODO: render grid
         self.render_grid()
+        #Render additional GUI        
+        self.render_gui()
         #TODO: Render non moving blocks
         self.render_non_moving_blocks()
         #TODO: Render current tetramino
         if self.current_tetra is not None:
             self.current_tetra.render(self)
+            
+            self.render_shadow_block()
     
     def render_grid(self):
         for col in self.pos_matrix:
@@ -93,6 +103,9 @@ class GameWorld(object):
                     self.pos_matrix[-1][len(self.pos_matrix[0]) - 1][1] + self.mino_height)
         pygame.draw.line(self.screen_surface, (62, 62, 62), temp_beg, temp_end, 2)
         
+    def render_gui(self):
+        point_surface = self.default_font.render( str(self.points), True, (255,255,255), (0,0,0))
+        self.screen_surface.blit( point_surface, (SCREEN_SIZE[0] - 50, 50) )
     
     def render_non_moving_blocks(self):
         
@@ -106,6 +119,22 @@ class GameWorld(object):
                           self.mino_width, 
                           self.mino_height), 
                          1)
+    
+    def render_shadow_block(self):
+        
+        shadow_tetra = Tetramine(self.current_tetra.scheme, 
+                                 self.current_tetra.current_orientation, 
+                                 self.current_tetra.rotations, 
+                                 self.current_tetra.renders)
+        
+        shadow_tetra.place(self.current_tetra.x, self.current_tetra.y)
+        
+        while ( (shadow_tetra.checkBoundaries(self) == True) and (shadow_tetra.checkCollisions(self) == True) ):
+            shadow_tetra.place( shadow_tetra.x, shadow_tetra.y + 1 )
+    
+        shadow_tetra.place( shadow_tetra.x, shadow_tetra.y - 1 )
+    
+        shadow_tetra.render(self)
     
     def checkLines(self):
         lines = []
@@ -199,6 +228,9 @@ while True:
                 if tetris.current_tetra.checkBoundaries(tetris) == False:
                     tetris.current_tetra.y -= 1
                 
+                if (tetris.game_over is not True):
+                    tetris.points += 1
+                
         elif event.type == pygame.USEREVENT + 2:
             print "Transition."
             if tetris.current_tetra.isAtBottom(tetris) == True:
@@ -259,6 +291,9 @@ while True:
                     else:
                         transitionTimer = False
                         pygame.time.set_timer(pygame.USEREVENT + 2, 0)
+                    
+                    if (tetris.game_over is not True):
+                        tetris.points += 1
 
     if (tetris.current_tetra is not None) and (tetris.current_tetra.isAtBottom(tetris) == True):
         print "Bottom!!!"
