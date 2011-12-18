@@ -5,6 +5,7 @@ Created on 11/set/2011
 '''
 
 import pygame
+import math
 
 class Tetramine(object):
     '''
@@ -84,32 +85,41 @@ class Tetramine(object):
         
     def  render(self, world, center_color = (255, 0, 0), mino_color = (255, 255, 255)):
         
-        try:    
-            pygame.draw.rect(world.screen_surface, 
-                         center_color, 
-                         (world.pos_matrix[self.x][self.y][0], 
-                          world.pos_matrix[self.x][self.y][1], 
-                          world.mino_width, 
-                          world.mino_height), 
-                         1)
-        except IndexError:
-            print "--------------> Error at (%i, %i)" % (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1])
-            
+        border_thickness = 5
+        
+        #=======================================================================
+        # try:    
+        #    pygame.draw.rect(world.screen_surface, 
+        #                 center_color, 
+        #                 (world.pos_matrix[self.x][self.y][0] + int(math.ceil(border_thickness / 2.0)), 
+        #                  world.pos_matrix[self.x][self.y][1] + int(math.ceil(border_thickness / 2.0)), 
+        #                  world.mino_width - border_thickness, 
+        #                  world.mino_height - border_thickness), 
+        #                 border_thickness)
+        # except IndexError:
+        #    print "--------------> Error at (%i, %i)" % (world.pos_matrix[self.x][self.y][0], world.pos_matrix[self.x][self.y][1])
+        #=======================================================================
+        
+        self.render_mino(world, [0, 0], mino_color)
+        
         for mino_offset in self.renders[self.current_orientation]:
             self.render_mino(world, mino_offset, mino_color)
        
         
     def render_mino(self, world, mino_offset, color):
         
+        border_thickness = 11
+        border_offset = int(math.ceil(border_thickness / 2.0))
+        
         x_pos, y_pos = self.calculate_mino_position(mino_offset)
         try:
             pygame.draw.rect(world.screen_surface, 
                              color, 
-                             (world.pos_matrix[x_pos][y_pos][0],
-                              world.pos_matrix[x_pos][y_pos][1], 
-                              world.mino_width, 
-                              world.mino_height), 
-                              1)
+                             (world.pos_matrix[x_pos][y_pos][0] + border_offset,
+                              world.pos_matrix[x_pos][y_pos][1] + border_offset,
+                              world.mino_width - border_thickness, 
+                              world.mino_height - border_thickness), 
+                              border_thickness)
         except IndexError:
             print "("+ str(x_pos) +")" + " ("+ str(y_pos) +")"
             raise IndexError

@@ -109,11 +109,13 @@ class GameWorld(object):
     
     def render_non_moving_blocks(self):
         
+        non_moving_block_color = (255, 218, 51)
+        
         for x in range(len(self.world_matrix)):
             for y in range(len(self.world_matrix[x])):
                 if self.world_matrix[x][y] == 3:
                     pygame.draw.rect(self.screen_surface, 
-                         (0, 255, 127), 
+                         non_moving_block_color, 
                          (self.pos_matrix[x][y][0], 
                           self.pos_matrix[x][y][1], 
                           self.mino_width, 
@@ -134,7 +136,7 @@ class GameWorld(object):
     
         shadow_tetra.place( shadow_tetra.x, shadow_tetra.y - 1 )
     
-        shadow_tetra.render(self)
+        shadow_tetra.render(self, center_color = (30, 140, 50), mino_color = (30, 140, 50) )
     
     def checkLines(self):
         lines = []
